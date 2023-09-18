@@ -3,10 +3,10 @@ package com.teacode.service;
 import com.teacode.entity.Task;
 import com.teacode.repository.TaskRepository;
 import org.springframework.stereotype.Service;
-import java.util.NoSuchElementException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Service
 public class TaskService {
@@ -44,5 +44,22 @@ public class TaskService {
     public String deleteTask(String taskId){
         taskRepository.deleteById(taskId);
         return taskId+"task deleted from dashboard";
+    }
+    public Task updateTaskByFields(String taskId, Map<String, Object> fields) {
+        Optional<Task> existingProduct = taskRepository.findById(taskId);
+        if (existingProduct.isPresent()) {
+            fields.forEach((key, value) -> {
+                try{
+                    Field field = ReflectionUtils.findField(Task.class, key);
+                    assert field != null;
+                    field.setAccessible(true);
+                    ReflectionUtils.setField(field, existingProduct.get(), value);
+                }catch(Exception e){
+                    throw new NullPointerException("Null Pointer Exception Occured");
+                }
+            });
+            return taskRepository.save(existingProduct.get());
+        }
+        return null;
     }
 }

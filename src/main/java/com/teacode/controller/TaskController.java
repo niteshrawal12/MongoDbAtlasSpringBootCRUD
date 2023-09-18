@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks")
@@ -44,6 +45,12 @@ public class TaskController {
     public Task modifyTask(@RequestBody Task task){
         return taskService.updateTask(task);
     }
+    @PatchMapping("/{id}")
+    public Task updateTaskFields(@PathVariable String id,@RequestBody Map<String, Object> fields){
+        return taskService.updateTaskByFields(id,fields);
+    }
+
+
     @DeleteMapping("/{taskId}")
     public String deleteTask(@PathVariable String taskId){
         return taskService.deleteTask(taskId);
